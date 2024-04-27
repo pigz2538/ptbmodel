@@ -55,7 +55,7 @@ def crystal_to_dgl(crystal, atomic_numbers, r_neighborhood):
     lattice_frame = crystal.as_dataframe()
     radius = torch.tensor([x.specie.atomic_radius_calculated for x in crystal])
     
-    mass = torch.tensor([x.specie.atomic_mass for x in crystal])
+    mass = torch.tensor([x.specie.atomic_mass for x in crystal]) / radius**3
     massx = torch.sum(mass * lattice_frame['x'].to_numpy())/torch.sum(mass)
     massy = torch.sum(mass * lattice_frame['y'].to_numpy())/torch.sum(mass)
     massz = torch.sum(mass * lattice_frame['z'].to_numpy())/torch.sum(mass)
@@ -78,6 +78,7 @@ def crystal_to_dgl(crystal, atomic_numbers, r_neighborhood):
 
     graph.ndata['species'] = torch.tensor(atomic_numbers)
     graph.ndata['radius'] = radius
+    graph.ndata['index'] = torch.arange(a_num)
     coord = torch.tensor(np.stack((lattice_frame['a'], lattice_frame['b'], lattice_frame['c'], lattice_frame['x'], lattice_frame['y'], lattice_frame['z']), axis=1))
     prop = torch.stack((graph.ndata['species'], radius, mass), dim=1)
     features = torch.cat((prop, coord, xb, yb, zb, outene), dim=1)

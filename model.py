@@ -316,67 +316,67 @@ class HoppingNN(nn.Module): # 从轨道特征生成Slater Koster参量
         else:
             vfeat = zeros
         if orb_key[1]: # Vsps
-            vfeat = torch.cat((vfeat, self.mlp_list[1](torch.cat([sfeat[atom1]/(d**2), pfeat[atom2]/(d**2),ex_d], 1))),-1)
+            vfeat = torch.cat((vfeat, self.mlp_list[1](torch.cat([sfeat[atom1]/(d**2), pfeat[atom2]/(d**2), ex_d], 1))),-1)
         else:
             vfeat = torch.cat((vfeat, zeros),-1)
 
         if orb_key[2]: # Vpps
-            vfeat = torch.cat((vfeat, self.mlp_list[2](torch.cat([pfeat[atom1]/(d**2), pfeat[atom2]/(d**2),ex_d], 1))),-1)
+            vfeat = torch.cat((vfeat, self.mlp_list[2](torch.cat([pfeat[atom1]/(d**2), pfeat[atom2]/(d**2), ex_d], 1))),-1)
         else:
             vfeat = torch.cat((vfeat, zeros),-1)
 
         if orb_key[3]: # Vppp
-            vfeat = torch.cat((vfeat, self.mlp_list[3](torch.cat([pfeat[atom1]/(d**2), pfeat[atom2]/(d**2),ex_d], 1))),-1)
+            vfeat = torch.cat((vfeat, self.mlp_list[3](torch.cat([pfeat[atom1]/(d**2), pfeat[atom2]/(d**2), ex_d], 1))),-1)
         else:
             vfeat = torch.cat((vfeat, zeros),-1)
 
         if orb_key[4]: # Vsds
-            vfeat = torch.cat((vfeat, self.mlp_list[4](torch.cat([sfeat[atom1]/(d**2), dfeat[atom2]/(d**2),ex_d], 1))),-1)
+            vfeat = torch.cat((vfeat, self.mlp_list[4](torch.cat([sfeat[atom1]/(d**2), dfeat[atom2]/(d**2), ex_d], 1))),-1)
         else:
             vfeat = torch.cat((vfeat, zeros),-1)
 
         if orb_key[5]: # Vpds
-            vfeat = torch.cat((vfeat, self.mlp_list[5](torch.cat([pfeat[atom1]/(d**2), dfeat[atom2]/(d**2),ex_d], 1))),-1)
+            vfeat = torch.cat((vfeat, self.mlp_list[5](torch.cat([pfeat[atom1]/(d**2), dfeat[atom2]/(d**2), ex_d], 1))),-1)
         else:
             vfeat = torch.cat((vfeat, zeros),-1)
 
         if orb_key[6]: # Vpdp
-            vfeat = torch.cat((vfeat, self.mlp_list[6](torch.cat([pfeat[atom1]/(d**2), dfeat[atom2]/(d**2),ex_d], 1))),-1)
+            vfeat = torch.cat((vfeat, self.mlp_list[6](torch.cat([pfeat[atom1]/(d**2), dfeat[atom2]/(d**2), ex_d], 1))),-1)
         else:
             vfeat = torch.cat((vfeat, zeros),-1)
 
         if orb_key[7]: # Vdds
-            vfeat = torch.cat((vfeat, self.mlp_list[7](torch.cat([dfeat[atom1]/(d**2), dfeat[atom2]/(d**2),ex_d], 1))),-1)
+            vfeat = torch.cat((vfeat, self.mlp_list[7](torch.cat([dfeat[atom1]/(d**2), dfeat[atom2]/(d**2), ex_d], 1))),-1)
         else:
             vfeat = torch.cat((vfeat, zeros),-1)
         
         if orb_key[8]: # Vddp
-            vfeat = torch.cat((vfeat, self.mlp_list[8](torch.cat([dfeat[atom1]/(d**2), dfeat[atom2]/(d**2),ex_d], 1))),-1)
+            vfeat = torch.cat((vfeat, self.mlp_list[8](torch.cat([dfeat[atom1]/(d**2), dfeat[atom2]/(d**2), ex_d], 1))),-1)
         else:
             vfeat = torch.cat((vfeat, zeros),-1)
         
         if orb_key[9]: # Vddd
-            vfeat = torch.cat((vfeat, self.mlp_list[9](torch.cat([dfeat[atom1]/(d**2), dfeat[atom2]/(d**2),ex_d], 1))),-1)
+            vfeat = torch.cat((vfeat, self.mlp_list[9](torch.cat([dfeat[atom1]/(d**2), dfeat[atom2]/(d**2), ex_d], 1))),-1)
         else:
             vfeat = torch.cat((vfeat, zeros),-1)
         
         if orb_key[10]: # VSSs
-            vfeat = torch.cat((vfeat, self.mlp_list[10](torch.cat([Sfeat[atom1]/(d**2), Sfeat[atom2]/(d**2),ex_d], 1))),-1)
+            vfeat = torch.cat((vfeat, self.mlp_list[10](torch.cat([Sfeat[atom1]/(d**2), Sfeat[atom2]/(d**2), ex_d], 1))),-1)
         else:
             vfeat = torch.cat((vfeat, zeros),-1)
         
         if orb_key[11]: # VSss
-            vfeat = torch.cat((vfeat, self.mlp_list[11](torch.cat([Sfeat[atom1]/(d**2), sfeat[atom2]/(d**2),ex_d], 1))),-1)
+            vfeat = torch.cat((vfeat, self.mlp_list[11](torch.cat([Sfeat[atom1]/(d**2), sfeat[atom2]/(d**2), ex_d], 1))),-1)
         else:
             vfeat = torch.cat((vfeat, zeros),-1)
         
         if orb_key[12]: # VSps
-            vfeat = torch.cat((vfeat, self.mlp_list[12](torch.cat([Sfeat[atom1]/(d**2), pfeat[atom2]/(d**2),ex_d], 1))),-1)
+            vfeat = torch.cat((vfeat, self.mlp_list[12](torch.cat([Sfeat[atom1]/(d**2), pfeat[atom2]/(d**2), ex_d], 1))),-1)
         else:
             vfeat = torch.cat((vfeat, zeros),-1)
         
         if orb_key[13]: # VSds
-            vfeat = torch.cat((vfeat, self.mlp_list[13](torch.cat([Sfeat[atom1]/(d**2), dfeat[atom2]/(d**2),ex_d], 1))),-1)
+            vfeat = torch.cat((vfeat, self.mlp_list[13](torch.cat([Sfeat[atom1]/(d**2), dfeat[atom2]/(d**2), ex_d], 1))),-1)
         else:
             vfeat = torch.cat((vfeat, zeros),-1)
         
@@ -448,10 +448,11 @@ class WHOLEMODEL(nn.Module):
         self.graph_dim = graph_dim
         self.atom_num = atom_num
 
-        self.atomic_feat = nn.Embedding(120, self.embedding_dim) 
+        # self.atomic_feat = nn.Embedding(120, self.embedding_dim) 
+        self.index_feat = nn.Embedding(50, self.embedding_dim) 
 
         self.orbnn = OrbitalNN([graph_dim + embedding_dim] + orb_dim_list, orbital_activation)
-        self.gnn = GraphNN([orb_dim_list[-1] * 10] + gnn_dim_list, gnn_head_list)
+        self.gnn = GraphNN([orb_dim_list[-1] * 10 +  graph_dim - 3] + gnn_dim_list, gnn_head_list)
         # self.onn = OnsiteNN(onsite_dim_list, onsite_num, onsite_activation)
         self.onn = OnsiteNN(onsite_dim_list, onsite_activation)
         # self.hnn = HoppingNN(hopping_dim_list1, hopping_dim_list2, hopping_activation)
@@ -463,16 +464,17 @@ class WHOLEMODEL(nn.Module):
 
         featstable = bg.ndata['feature'][:, :self.graph_dim]
         if self.embedding_dim > 0:
-            featembedding = self.atomic_feat(bg.ndata["species"]).reshape([-1,self.embedding_dim])
-            featall = torch.cat((featstable, featembedding), dim=1)
+            # featembedding = self.atomic_feat(bg.ndata['species'])
+            indexembedding = self.index_feat(bg.ndata['index'])
+            featall = torch.cat((featstable, indexembedding), dim=1)
         else:
             featall = featstable
             
-        feato = self.orbnn(featall)
+        feato = torch.cat((self.orbnn(featall), featstable[:,3:]), dim=1)
 
         bg.ndata['feature'] = feato
 
-        feat = self.gnn(bg, feato) 
+        feat = self.gnn(bg, feato)
 
     # o = self.onn(feat[:cell_atom_num])
         o = self.onn(feat, onsite_key, onsite_num)

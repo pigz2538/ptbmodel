@@ -100,8 +100,6 @@ def train(dist_path):
     atom_num               = config_para['atom_num']
     is_orb                 = config_para['is_orb']
 
-    gnn_dim_list[0] = embedding_dim + graph_dim
-
     utils.seed_torch(seed = 24)
     
     trainset, traininfos = utils.get_data(
@@ -175,7 +173,8 @@ def train(dist_path):
             opt.load_state_dict(checkpoint['optimizer_state_dict'])
         if not reset_sch:
             sch.load_state_dict(checkpoint['scheduler_state_dict'])
-        loss = checkpoint['loss']
+        loss = checkpoint['train_loss']
+        min_test = checkpoint['test_loss']
         start_epoch = checkpoint['epoch']
         print('Load epoch {} succeed！'.format(start_epoch))
         if os.path.exists(os.path.join(dist_path, 'results/losses.npy')):
@@ -194,9 +193,14 @@ def train(dist_path):
             test_losses = np.zeros(num_epoch)
     else:
         start_epoch = 0
+        loss = 100
+        min_test = 100
         losses = np.zeros(num_epoch)
         test_losses = np.zeros(num_epoch)
         print('Can not load saved model!Training from beginning!')
+
+
+    print(min_test)
 
     para_sk, hopping_index, hopping_info, d, is_hopping, onsite_key, cell_atom_num, onsite_num, orb1_index, orb2_index, orb_num, rvectors, rvectors_all, tensor_E, tensor_eikr, orb_key, filename = utils.batch_index(train_dataloader, traininfos, batch_size)
 
@@ -272,7 +276,9 @@ def train(dist_path):
                     'model_state_dict': model.state_dict(),
                     'optimizer_state_dict': opt.state_dict(),
                     'scheduler_state_dict': sch.state_dict(),
-                    'loss': loss_per_epoch.sum() / train_num
+                    'loss': loss_per_epoch.sum() / train_num,
+                    'train_loss': loss_per_epoch.sum() / train_num,
+                    'test_loss': test_loss / test_num
                     }
             torch.save(check_point, os.path.join(dist_path, 'results/test{}.pkl'.format(epoch)))
             
@@ -280,6 +286,22 @@ def train(dist_path):
 
             np.save(os.path.join(dist_path,'results/losses.npy'), losses)
             np.save(os.path.join(dist_path,'results/test_losses.npy'), test_losses)
+
+        print(min_test)
+        if (test_loss / test_num) < min_test:
+
+            min_test = test_loss / test_num
+            check_point = {
+                    'epoch': epoch,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': opt.state_dict(),
+                    'scheduler_state_dict': sch.state_dict(),
+                    'loss': loss_per_epoch.sum() / train_num,
+                    'train_loss': loss_per_epoch.sum() / train_num,
+                    'test_loss': test_loss / test_num
+                    }
+            
+            torch.save(check_point, os.path.join(dist_path, 'results/test_min.pkl'.format(epoch)))
 
     print('trainging OK!')
 
