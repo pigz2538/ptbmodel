@@ -111,29 +111,61 @@ def rvector_init(dim):
             rvectors[:, index[i]] = np.tile(pk, 3 ** (dim_num - 1))
     return rvectors
 
+# def get_onsite_key(crystal, calorb, cell_atom_num):
+#     shapes = 0
+
+#     temp1 = []
+#     temp2 = []
+#     temp3 = np.array([], dtype=np.int64)
+#     temp4 = np.array([], dtype=np.int64)
+#     onsite_key = []
+#     for i in range(cell_atom_num):
+#         x = crystal.species[i]
+#         t1 = np.where(np.array(calorb[x.name])==1)[0]
+#         ti = np.repeat(t1, t1.size)
+#         tj = np.tile(t1, t1.size)
+#         tr = np.stack((ti, tj), axis=1) + i * 10
+#         temp1.append(t1.size) # Graph中原子序号
+#         temp2.append(tr) # 在位能不同轨道
+#         temp3 = np.append(temp3, t1)
+#         temp4 = np.append(temp4, np.arange(0, t1.size**2, t1.size)+np.arange(0,t1.size,1)+shapes) # 在位能同轨道
+#         shapes += tr.shape[0]
+
+#     temp1 = np.arange(0,cell_atom_num,1).repeat(temp1)
+    
+#     return [temp1, temp2, temp3, temp4]
+
+
 def get_onsite_key(crystal, calorb, cell_atom_num):
     shapes = 0
 
     temp1 = []
     temp2 = []
     temp3 = np.array([], dtype=np.int64)
-    temp4 = np.array([], dtype=np.int64)
+    temp4 = 0
     onsite_key = []
+
+    osum = []
     for i in range(cell_atom_num):
         x = crystal.species[i]
         t1 = np.where(np.array(calorb[x.name])==1)[0]
-        ti = np.repeat(t1, t1.size)
-        tj = np.tile(t1, t1.size)
-        tr = np.stack((ti, tj), axis=1) + i * 10
+        osum.append(np.sum(np.array(calorb[x.name])))
+        t2 = np.arange(osum[i])
+        ti = np.repeat(t2, t2.size)
+        tj = np.tile(t2, t2.size)
+        tr = np.stack((ti, tj), axis=1) + sum(osum[:i])
         temp1.append(t1.size) # Graph中原子序号
         temp2.append(tr) # 在位能不同轨道
         temp3 = np.append(temp3, t1)
-        temp4 = np.append(temp4, np.arange(0, t1.size**2, t1.size)+np.arange(0,t1.size,1)+shapes) # 在位能同轨道
-        shapes += tr.shape[0]
+        temp4 += osum[i] ** 2
+        # shapes += tr.shape[0]
 
     temp1 = np.arange(0,cell_atom_num,1).repeat(temp1)
-    
-    return [temp1, temp3, temp4]
+    temp4 = np.arange(temp4)
+
+    temp2 = np.concatenate(temp2)
+
+    return [temp1.astype(int), temp2.astype(int), temp3.astype(int), temp4.astype(int)]
 
 def get_orb_index(crystal, calorb, cell_atom_num, atom_num):
     orb1_indexs, orb1_indexp, orb1_indexd, orb1_indexS = [], [], [], []

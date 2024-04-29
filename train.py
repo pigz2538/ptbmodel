@@ -88,10 +88,12 @@ def train(dist_path):
 
     # configure network structure
     embedding_dim          = config_para['embedding_dim']
+    index_dim              = config_para['index_dim']
     graph_dim              = config_para['graph_dim']
     gnn_dim_list           = config_para['gnn_dim_list']
     gnn_head_list          = config_para['gnn_head_list']
-    onsite_dim_list        = config_para['onsite_dim_list']
+    onsite_dim_list1       = config_para['onsite_dim_list1']
+    onsite_dim_list2       = config_para['onsite_dim_list2']
     orb_dim_list           = config_para['orb_dim_list']
     hopping_dim_list1      = config_para['hopping_dim_list1']
     hopping_dim_list2      = config_para['hopping_dim_list2']
@@ -136,11 +138,13 @@ def train(dist_path):
 
     model = WHOLEMODEL(
                         embedding_dim = embedding_dim,
+                        index_dim = index_dim,
                         graph_dim = graph_dim,
                         gnn_dim_list = gnn_dim_list,
                         gnn_head_list = gnn_head_list,
                         orb_dim_list = orb_dim_list,
-                        onsite_dim_list = onsite_dim_list,
+                        onsite_dim_list1 = onsite_dim_list1,
+                        onsite_dim_list2 = onsite_dim_list2,
                         hopping_dim_list1 = hopping_dim_list1,
                         hopping_dim_list2 = hopping_dim_list2,
                         expander_bessel_dim = expander_bessel_dim,

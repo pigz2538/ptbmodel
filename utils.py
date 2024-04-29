@@ -185,11 +185,11 @@ def batch_index(train_dataloader, infos, batch_size):
 
     for graphs, labels in train_dataloader:
         label = labels.numpy()
-        sum_atom, hopping_index_batch, hopping_info_batch, para_sk_batch, is_hopping_batch, d_batch, cell_atom_num_batch, onsite_num_batch, orb1_index_batch, orb2_index_batch, orb_num_batch, rvectors_batch, rvectors_all_batch, tensor_E_batch, tensor_eikr_batch, filename_batch = [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []
+        sum_atom, hopping_index_batch, hopping_info_batch, para_sk_batch, is_hopping_batch, d_batch, cell_atom_num_batch, onsite_num_batch, onsite_key_batch, orb_num_batch, rvectors_batch, rvectors_all_batch, tensor_E_batch, tensor_eikr_batch, filename_batch = [], [], [], [], [], [], [], [], [], [], [], [], [], [], []
 
         orb_key_batch = np.zeros(14)
 
-        ok1, ok2, ok3 = [], [], []
+        ok1, ok2, ok3, ok4 = [], [], [], []
 
         obm1, obm2, obm3, obm4 = [], [], [], []
         obn1, obn2, obn3, obn4 = [], [], [], []
@@ -205,8 +205,11 @@ def batch_index(train_dataloader, infos, batch_size):
             d_batch.append(infos[i]['d'])
             onsite_num_batch.append(infos[i]['onsite_num'])
             ok1.append(infos[i]['onsite_key'][0] + add_num)
-            ok2.append(infos[i]['onsite_key'][1])
-            ok3.append(infos[i]['onsite_key'][2] + sum(sum(onsite_num_batch[0:]) - infos[i]['onsite_num']))
+            onsite_key_batch.append(len(infos[i]['onsite_key'][0]))
+            
+            ok2.append(infos[i]['onsite_key'][1] + sum(onsite_key_batch) - len(infos[i]['onsite_key'][0]))
+            ok3.append(infos[i]['onsite_key'][2])
+            ok4.append(infos[i]['onsite_key'][3] + sum(sum(onsite_num_batch) - infos[i]['onsite_num']))
 
             obm1 += list((np.array(infos[i]['orb1_index'][0]) + add_num))
             obm2 += list((np.array(infos[i]['orb1_index'][1]) + add_num))
@@ -250,7 +253,7 @@ def batch_index(train_dataloader, infos, batch_size):
         tensor_eikr.append(torch.stack(tensor_eikr_batch, dim=0))
         tensor_E.append(torch.stack(tensor_E_batch, dim=0))
 
-        onsite_key.append([np.concatenate(ok1), np.concatenate(ok2), np.concatenate(ok3)])
+        onsite_key.append([np.concatenate(ok1), np.concatenate(ok2), np.concatenate(ok3), np.concatenate(ok4)])
 
         cell_atom_num.append(sum(cell_atom_num_batch))
         onsite_num.append(np.concatenate(onsite_num_batch))

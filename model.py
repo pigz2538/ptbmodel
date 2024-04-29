@@ -256,10 +256,11 @@ class OrbitalNN(nn.Module):  # 扩展为轨道特征
 
 class OnsiteNN(nn.Module): # 从轨道特征变成在位能
 
-    def __init__(self, onsite_dim_list, activation = nn.LeakyReLU()):
+    def __init__(self, onsite_dim_list1, onsite_dim_list2, activation = nn.LeakyReLU()):
         super(OnsiteNN, self).__init__()
 
-        self.onsite_mlp = [MLP(onsite_dim_list, activation) for i in range(10)]
+        self.onsite_mlp1 = [MLP(onsite_dim_list1, activation) for i in range(10)]
+        self.onsite_mlp2 = MLP(onsite_dim_list2, activation)
 
     def forward(self, ofeat, onsite_key, onsite_num):
         '''
@@ -269,18 +270,46 @@ class OnsiteNN(nn.Module): # 从轨道特征变成在位能
                    3: onsite矩阵的位置
         ''' 
         onsite = torch.zeros(onsite_num).to(device)
+        feat = []
 
         for i in range(onsite_key[0].size):
-            onsite[onsite_key[2][i]] = self.onsite_mlp[onsite_key[1][i]](ofeat[onsite_key[0]][i])
-        
-        return onsite.flatten()
+            feat.append(self.onsite_mlp1[onsite_key[2][i]](ofeat[onsite_key[0][i]]))
 
+        feat = torch.stack(feat)
+
+        onsite[onsite_key[3]] = self.onsite_mlp2(torch.cat((feat[onsite_key[1][:,0]], feat[onsite_key[1][:,1]]),dim=1)).flatten()
+        
+        return onsite
+
+class SpdfNN(nn.Module):
+
+    def __init__(self,
+                 hopping_dim_list1,
+                 activation = nn.LeakyReLU()):
+        
+        super(SpdfNN, self).__init__()
+
+        self.activation = activation
+        self.hopping_dim_list1 = hopping_dim_list1
+
+
+        self.smlp = MLP(hopping_dim_list1, activation)
+        self.Smlp = MLP(hopping_dim_list1, activation)
+        self.pmlp = MLP(hopping_dim_list1, activation)
+        self.dmlp = MLP(hopping_dim_list1, activation)
+
+    def forward(self, feat):
+        sfeat = self.smlp(feat)
+        pfeat = self.pmlp(feat)
+        dfeat = self.dmlp(feat)
+        Sfeat = self.Smlp(feat)
+
+        return [sfeat, pfeat, dfeat, Sfeat]
 
 
 class HoppingNN(nn.Module): # 从轨道特征生成Slater Koster参量
 
     def __init__(self,
-                 hopping_dim_list1,
                  hopping_dim_list2,
                  is_orb = [1,1,1,1],
                  activation = nn.LeakyReLU()):
@@ -290,21 +319,15 @@ class HoppingNN(nn.Module): # 从轨道特征生成Slater Koster参量
 
         self.activation = activation
         self.is_orb = is_orb
-        self.hopping_dim_list1 = hopping_dim_list1
         self.hopping_dim_list2 = hopping_dim_list2
-
-        self.smlp = MLP(hopping_dim_list1, activation)
-        self.Smlp = MLP(hopping_dim_list1, activation)
-        self.pmlp = MLP(hopping_dim_list1, activation)
-        self.dmlp = MLP(hopping_dim_list1, activation)
 
         self.mlp_list = [MLP(hopping_dim_list2, activation) for i in range(14)]
 
-    def forward(self, feat,  hopping_index, atom_num, orb_key, d, ex_d, orb1_index, orb2_index):
-        sfeat = self.smlp(feat)
-        pfeat = self.pmlp(feat)
-        dfeat = self.dmlp(feat)
-        Sfeat = self.Smlp(feat)
+    def forward(self, feat, hopping_index, atom_num, orb_key, d, ex_d, orb1_index, orb2_index):
+        sfeat = feat[0]
+        pfeat = feat[1]
+        dfeat = feat[2]
+        Sfeat = feat[3]
          
         # 合并成s S p d 轨道特征
         atom1, atom2 = hopping_index[:,0], hopping_index[:,1]
@@ -425,11 +448,13 @@ class WHOLEMODEL(nn.Module):
 
     def __init__(self,
                   embedding_dim,
+                  index_dim,
                   graph_dim,
                   gnn_dim_list,
                   gnn_head_list,
                   orb_dim_list,
-                  onsite_dim_list,
+                  onsite_dim_list1,
+                  onsite_dim_list2,
                   hopping_dim_list1,
                   hopping_dim_list2,
                   expander_bessel_dim,
@@ -445,18 +470,20 @@ class WHOLEMODEL(nn.Module):
         
         self.atomic_init_dim = gnn_dim_list[0]
         self.embedding_dim = embedding_dim
+        self.index_dim = index_dim
         self.graph_dim = graph_dim
         self.atom_num = atom_num
 
-        # self.atomic_feat = nn.Embedding(120, self.embedding_dim) 
-        self.index_feat = nn.Embedding(50, self.embedding_dim) 
+        self.atomic_feat = nn.Embedding(120, self.embedding_dim) 
+        self.index_feat = nn.Embedding(50, self.index_dim) 
 
-        self.orbnn = OrbitalNN([graph_dim + embedding_dim] + orb_dim_list, orbital_activation)
+        self.orbnn = OrbitalNN([graph_dim + embedding_dim + index_dim] + orb_dim_list, orbital_activation)
         self.gnn = GraphNN([orb_dim_list[-1] * 10 +  graph_dim - 3] + gnn_dim_list, gnn_head_list)
         # self.onn = OnsiteNN(onsite_dim_list, onsite_num, onsite_activation)
-        self.onn = OnsiteNN(onsite_dim_list, onsite_activation)
+        self.spdfnn = SpdfNN(hopping_dim_list1, hopping_activation)
+        self.onn = OnsiteNN(onsite_dim_list1, onsite_dim_list2, onsite_activation)
         # self.hnn = HoppingNN(hopping_dim_list1, hopping_dim_list2, hopping_activation)
-        self.hnn = HoppingNN(hopping_dim_list1, hopping_dim_list2, is_orb, hopping_activation)
+        self.hnn = HoppingNN(hopping_dim_list2, is_orb, hopping_activation)
         self.expander = BesselBasisLayer(expander_bessel_dim, expander_bessel_cutoff, expander_bessel_exponent)
         self.cutoff = expander_bessel_cutoff
         
@@ -464,9 +491,9 @@ class WHOLEMODEL(nn.Module):
 
         featstable = bg.ndata['feature'][:, :self.graph_dim]
         if self.embedding_dim > 0:
-            # featembedding = self.atomic_feat(bg.ndata['species'])
+            featembedding = self.atomic_feat(bg.ndata['species'])
             indexembedding = self.index_feat(bg.ndata['index'])
-            featall = torch.cat((featstable, indexembedding), dim=1)
+            featall = torch.cat((featstable, featembedding, indexembedding), dim=1)
         else:
             featall = featstable
             
@@ -476,10 +503,11 @@ class WHOLEMODEL(nn.Module):
 
         feat = self.gnn(bg, feato)
 
-    # o = self.onn(feat[:cell_atom_num])
+        spdffeats = self.spdfnn(feat)
+
         o = self.onn(feat, onsite_key, onsite_num)
         # h = self.hnn(feat, hopping_index, d, self.expander(d), orb_key)
-        h = self.hnn(feat, hopping_index, self.atom_num, orb_key, d, self.expander(d), orb1_index, orb2_index)
+        h = self.hnn(spdffeats, hopping_index, self.atom_num, orb_key, d, self.expander(d), orb1_index, orb2_index)
 
         hsk = torch.sum(h*para_sk, dim=1)
         hsk[torch.where(is_hopping==0)[0]] = o
