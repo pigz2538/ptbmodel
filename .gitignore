@@ -1,0 +1,7 @@
+results
+dgl
+__pycache__
+datas/test_data/dgl/graphs.bin
+datas/test_data/dgl/infos.bin
+datas/train_data/dgl/graphs.bin
+datas/train_data/dgl/infos.bin

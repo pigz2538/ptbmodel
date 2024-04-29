@@ -114,7 +114,7 @@ def train(dist_path):
     traingraphs, trainlabels, init_dim = trainset.get_all()
     # traingraphs = batch(traingraphs)
     # traingraphs = traingraphs.to(device)
-    train_dataloader = GraphDataLoader(trainset, batch_size = batch_size, drop_last = False, shuffle = False)
+    train_dataloader = GraphDataLoader(trainset, batch_size = batch_size, drop_last = False, shuffle = False, pin_memory = True)
 
     with open(os.path.join(dist_path, 'train_infos.txt'), 'w+') as file:
         for i in traininfos.values():
@@ -130,7 +130,7 @@ def train(dist_path):
     testgraphs, testlabels, init_dim = testset.get_all()
     # testgraphs = batch(testgraphs)
     # testgraphs = testgraphs.to(device)
-    test_dataloader = GraphDataLoader(testset, batch_size = 1, drop_last = False, shuffle = False)
+    test_dataloader = GraphDataLoader(testset, batch_size = 1, drop_last = False, shuffle = False, pin_memory = True)
 
     with open(os.path.join(dist_path, 'test_infos.txt'), 'w+') as file:
         for i in testinfos.values():
@@ -155,7 +155,7 @@ def train(dist_path):
 
     model = model.to(device)
 
-    opt = torch.optim.Adam(model.parameters(), lr_radio_init, eps=lr_eps)
+    opt = torch.optim.AdamW(model.parameters(), lr_radio_init, eps=lr_eps)
     sch = torch.optim.lr_scheduler.ReduceLROnPlateau(opt, mode='min', factor=lr_factor, patience=lr_patience*int(train_num / batch_size), verbose=lr_verbose, threshold=lr_threshold, threshold_mode='rel', cooldown=cooldown*int(train_num / batch_size), min_lr=min_lr, eps=lr_eps)
 
     print(lr_patience*int(train_num / batch_size))

@@ -13,6 +13,7 @@
     "lr_eps": 1e-16,
     "min_lr": 1e-5,
     "cooldown": 100,
+    "k_fold": 1,
     "is_sch": true,
     "is_L1": false,
     "is_L2": false,

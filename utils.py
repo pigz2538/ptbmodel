@@ -178,7 +178,7 @@ def get_coefficient(rvectors, hopping_info, hopping_orbital, max_orbital_num, at
             sk[:tmp_o.size] = tmp_o
             para_sk.append(sk)
 
-    return torch.tensor(para_sk)
+    return torch.as_tensor(para_sk)
 
 def batch_index(train_dataloader, infos, batch_size):
     para_sk, hopping_index, hopping_info, d, is_hopping, onsite_key, cell_atom_num, onsite_num, orb1_index, orb2_index, orb_num, rvectors, rvectors_all, tensor_E, tensor_eikr, orb_key, filename = [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []
