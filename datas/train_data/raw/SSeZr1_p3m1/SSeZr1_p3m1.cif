@@ -1,0 +1,28 @@
+data_image0
+_chemical_formula_structural       ZrSSe
+_chemical_formula_sum              "Zr1 S1 Se1"
+_cell_length_a       3.7374974048201786
+_cell_length_b       3.737497404820178
+_cell_length_c       19.5
+_cell_angle_alpha    90.0
+_cell_angle_beta     90.0
+_cell_angle_gamma    120.00000000000001
+
+_space_group_name_H-M_alt    "P 1"
+_space_group_IT_number       1
+
+loop_
+  _space_group_symop_operation_xyz
+  'x, y, z'
+
+loop_
+  _atom_site_type_symbol
+  _atom_site_label
+  _atom_site_symmetry_multiplicity
+  _atom_site_fract_x
+  _atom_site_fract_y
+  _atom_site_fract_z
+  _atom_site_occupancy
+  Zr  Zr1       1.0  2.785962936700496e-20  9.801005690945694e-39  0.5043124871794872  1.0000
+  S   S1        1.0  0.6666666665803729  0.33333333445042657  0.5754391764102564  1.0000
+  Se  Se1       1.0  0.33333333290567563  0.6666666658113513  0.42029107897435897  1.0000

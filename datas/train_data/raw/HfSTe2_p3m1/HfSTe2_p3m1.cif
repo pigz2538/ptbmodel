@@ -1,0 +1,28 @@
+data_image0
+_chemical_formula_structural       HfSTe
+_chemical_formula_sum              "Hf1 S1 Te1"
+_cell_length_a       3.7164274031726214
+_cell_length_b       3.7164274031726223
+_cell_length_c       18.232485982860293
+_cell_angle_alpha    90.0
+_cell_angle_beta     90.0
+_cell_angle_gamma    120.00000000000001
+
+_space_group_name_H-M_alt    "P 1"
+_space_group_IT_number       1
+
+loop_
+  _space_group_symop_operation_xyz
+  'x, y, z'
+
+loop_
+  _atom_site_type_symbol
+  _atom_site_label
+  _atom_site_symmetry_multiplicity
+  _atom_site_fract_x
+  _atom_site_fract_y
+  _atom_site_fract_z
+  _atom_site_occupancy
+  Hf  Hf1       1.0  2.5058437792028103e-18  0.0  0.5125551440864973  1.0000
+  S   S1        1.0  0.6666666661120209  0.3333333330777167  0.5891186956127279  1.0000
+  Te  Te1       1.0  0.6666666661120209  0.3333333330777167  0.40314298921769376  1.0000

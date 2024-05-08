@@ -41,7 +41,7 @@ def read_data(path, data_num):
         label = label_count
 
         calorb = dict(setjson['calorb'])
-        graph_s, hopping_info, hopping_orbital, hopping_index, rvectors, rvectors_all, outinfor, onsite_key, orb1_index, orb2_index = rd.read_cif(cif_file, calorb)
+        graph_s, hopping_info, hopping_orbital, hopping_index, rvectors, rvectors_all, outinfor, onsite_key, orb1_index, orb2_index, calorb_num = rd.read_cif(cif_file, calorb)
 
         graphs.append(graph_s.to(device))
         labels.append(label)
@@ -69,7 +69,6 @@ def read_data(path, data_num):
         coord = coord.reshape(-1, 2, 1)
         is_hopping = hopping_infos[:,7]
         
-        calorb_num = setjson['calorb_num']
         tmp = list(map(lambda x: x*x, calorb_num))
         onsite_num = np.array(tmp)
 

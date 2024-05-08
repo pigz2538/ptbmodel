@@ -247,6 +247,11 @@ def read_cif(cif_file, calorb):
     cell_atom_num = len(atomic_numbers)
     cell_num = rvectors.shape[0]
     atom_num = cell_atom_num * cell_num
+
+    calorb_num = []
+    for i in range(cell_atom_num):
+        calorb_num.append(sum(calorb[crystal.species[i].name]))
+
     onsite_key = get_onsite_key(crystal, calorb, cell_atom_num)
 
     hopping_info = []
@@ -291,5 +296,7 @@ def read_cif(cif_file, calorb):
     hopping_orbital = hopping_orbital
     hopping_index = np.array(hopping_index)
 
-    return graph_s, hopping_info, hopping_orbital, hopping_index, rvectors, rvectors_all, outinfor, onsite_key, orb1_index, orb2_index
+    print(calorb_num)
+
+    return graph_s, hopping_info, hopping_orbital, hopping_index, rvectors, rvectors_all, outinfor, onsite_key, orb1_index, orb2_index, calorb_num
 

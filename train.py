@@ -71,6 +71,10 @@ def train(dist_path):
     L2_radio       = config_para['L2_radio']
 
     averge_loss_radio = config_para['averge_loss_radio']
+    train_start_band  = config_para['train_start_band']
+    train_end_band    = config_para['train_end_band']
+    test_start_band   = config_para['test_start_band']
+    test_end_band     = config_para['test_end_band']
 
     reset_all        = config_para['reset_all']
     reset_model      = config_para['reset_model']
@@ -156,13 +160,16 @@ def train(dist_path):
     model = model.to(device)
 
     opt = torch.optim.AdamW(model.parameters(), lr_radio_init, eps=lr_eps)
+    
+    # opt = torch.optim.SGD(model.parameters(), lr=lr_radio_init)
     sch = torch.optim.lr_scheduler.ReduceLROnPlateau(opt, mode='min', factor=lr_factor, patience=lr_patience*int(train_num / batch_size), verbose=lr_verbose, threshold=lr_threshold, threshold_mode='rel', cooldown=cooldown*int(train_num / batch_size), min_lr=min_lr, eps=lr_eps)
 
     print(lr_patience*int(train_num / batch_size))
 
-    criterion = nn.SmoothL1Loss()
+    criterion = nn.SmoothL1Loss(reduction='sum', beta=0.1)
+    criterion2 = nn.SmoothL1Loss(reduction='sum', beta=0.1)
     MSEctiterion = nn.MSELoss()
-    loss_per_epoch = np.zeros(int(train_num / batch_size))  
+    loss_per_epoch = np.zeros(int(np.ceil(train_num / batch_size)))  
     losses = np.zeros(num_epoch)
     test_losses = np.zeros(num_epoch)
 
@@ -224,9 +231,9 @@ def train(dist_path):
             for j in range(len(labels)):
                 HR = utils.construct_hr(hsk[j * b1:(j + 1) * b1], hopping_info[i][j * b2:(j + 1) * b2], orb_num[i][j * b3:(j + 1) * b3], b4, rvectors[i][j])
                 reproduced_bands = utils.compute_bands(HR, tensor_eikr[i][j])
-                loss += criterion(reproduced_bands[:, 4:12], tensor_E[i][j][:, 4:12])
-                # loss += criterion(torch.mean(reproduced_bands[:, 4:12], dim=0), torch.mean(tensor_E[i][j][:, 4:12], dim=0)) * averge_loss_radio
-                # loss += MSEctiterion(reproduced_bands[:, 4:12], tensor_E[i][j][:, 4:12])
+                loss += criterion(reproduced_bands[:, train_start_band:train_end_band], tensor_E[i][j][:, train_start_band:train_end_band])
+                # loss += criterion(torch.mean(reproduced_bands[:, train_start_band:train_end_band], dim=0), torch.mean(tensor_E[i][j][:, train_start_band:train_end_band], dim=0)) * averge_loss_radio
+                # loss += MSEctiterion(reproduced_bands[:, train_start_band:train_end_band], tensor_E[i][j][:, train_start_band:train_end_band])
 
             if is_L1:
                 L1 = 0
@@ -263,7 +270,7 @@ def train(dist_path):
 
                 reproduced_bands = utils.compute_bands(HR, testinfos[i]['tensor_eikr'])
 
-                test_loss += criterion(reproduced_bands[:, 4:12], testinfos[i]['tensor_E'][:, 4:12]).item()
+                test_loss += criterion2(reproduced_bands[:, test_start_band:test_end_band], testinfos[i]['tensor_E'][:, test_start_band:test_end_band]).item()
         
         # print(loss_per_epoch)
         # print(test_loss)
