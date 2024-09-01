@@ -240,7 +240,6 @@ def batch_index(train_dataloader, infos, batch_size):
             obn3 += list((np.array(infos[i]['orb2_index'][2]) + np.array([4,5,6,7,8])* sum(sum_atom) + sum_cell))
             obn4 += list((np.array(infos[i]['orb2_index'][3]) + sum(sum_atom) * 9 + sum_cell))
 
-
         hopping_index.append(torch.cat(hopping_index_batch))
         hopping_info.append(torch.cat(hopping_info_batch))
         is_hopping.append(torch.cat(is_hopping_batch))

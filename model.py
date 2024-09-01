@@ -277,7 +277,7 @@ class OnsiteNN(nn.Module): # 从轨道特征变成在位能
 
         feat = torch.stack(feat)
 
-        onsite[onsite_key[3]] = self.onsite_mlp2(torch.cat((feat[onsite_key[1][:,0]], feat[onsite_key[1][:,1]]),dim=1)).flatten()
+        onsite[onsite_key[3]] = self.onsite_mlp2(torch.squeeze(torch.cat((feat[onsite_key[1][:,0]], feat[onsite_key[1][:,1]]),dim=-1),1)).flatten()
         
         return onsite
 
@@ -479,7 +479,7 @@ class WHOLEMODEL(nn.Module):
         self.index_feat = nn.Embedding(50, self.index_dim) 
 
         self.orbnn = OrbitalNN([graph_dim + embedding_dim + index_dim] + orb_dim_list, orbital_activation)
-        self.gnn = GraphNN([orb_dim_list[-1] * 10 +  graph_dim] + gnn_dim_list, gnn_head_list)
+        self.gnn = GraphNN([orb_dim_list[-1] * 10 +  graph_dim - 3] + gnn_dim_list, gnn_head_list)
         # self.onn = OnsiteNN(onsite_dim_list, onsite_num, onsite_activation)
         self.spdfnn = SpdfNN(hopping_dim_list1, hopping_activation)
         self.onn = OnsiteNN(onsite_dim_list1, onsite_dim_list2, onsite_activation)
@@ -498,7 +498,7 @@ class WHOLEMODEL(nn.Module):
         else:
             featall = featstable
             
-        feato = torch.cat((self.orbnn(featall), featstable), dim=1)
+        feato = torch.cat((self.orbnn(featall), featstable[:, 3:]), dim=1)
 
         bg.ndata['feature'] = feato
 

@@ -17,7 +17,7 @@ warnings.filterwarnings('ignore')  # 忽略所有警告
 
 device = 'cuda:0'
 
-seed = 1 # seed必须是int，可以自行设置
+seed = 5 # seed必须是int，可以自行设置
 torch.manual_seed(seed)
 torch.cuda.manual_seed(seed) # 让显卡产生的随机数一致
 torch.cuda.manual_seed_all(seed) # 多卡模式下，让所有显卡生成的随机数一致？这个待验证
@@ -62,6 +62,7 @@ def train(dist_path):
     min_lr         = config_para['min_lr']
     cooldown       = config_para['cooldown']
     is_sch         = config_para['is_sch']
+    is_shuffle     = config_para['is_shuffle']
     is_save        = config_para['is_save']
     save_frequncy  = config_para['save_frequncy']
 
@@ -118,7 +119,7 @@ def train(dist_path):
     traingraphs, trainlabels, init_dim = trainset.get_all()
     # traingraphs = batch(traingraphs)
     # traingraphs = traingraphs.to(device)
-    train_dataloader = GraphDataLoader(trainset, batch_size = batch_size, drop_last = False, shuffle = False, pin_memory = True)
+    train_dataloader = GraphDataLoader(trainset, batch_size = batch_size, drop_last = False, shuffle = is_shuffle, pin_memory = True)
 
     with open(os.path.join(dist_path, 'train_infos.txt'), 'w+') as file:
         for i in traininfos.values():
@@ -166,8 +167,8 @@ def train(dist_path):
 
     print(lr_patience*int(train_num / batch_size))
 
-    criterion = nn.SmoothL1Loss(reduction='sum', beta=0.1)
-    criterion2 = nn.SmoothL1Loss(reduction='sum', beta=0.1)
+    criterion = nn.SmoothL1Loss(beta=0.5)
+    criterion2 = nn.SmoothL1Loss()
     MSEctiterion = nn.MSELoss()
     loss_per_epoch = np.zeros(int(np.ceil(train_num / batch_size)))  
     losses = np.zeros(num_epoch)

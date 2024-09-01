@@ -296,7 +296,5 @@ def read_cif(cif_file, calorb):
     hopping_orbital = hopping_orbital
     hopping_index = np.array(hopping_index)
 
-    print(calorb_num)
-
     return graph_s, hopping_info, hopping_orbital, hopping_index, rvectors, rvectors_all, outinfor, onsite_key, orb1_index, orb2_index, calorb_num
 
