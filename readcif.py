@@ -111,31 +111,6 @@ def rvector_init(dim):
             rvectors[:, index[i]] = np.tile(pk, 3 ** (dim_num - 1))
     return rvectors
 
-# def get_onsite_key(crystal, calorb, cell_atom_num):
-#     shapes = 0
-
-#     temp1 = []
-#     temp2 = []
-#     temp3 = np.array([], dtype=np.int64)
-#     temp4 = np.array([], dtype=np.int64)
-#     onsite_key = []
-#     for i in range(cell_atom_num):
-#         x = crystal.species[i]
-#         t1 = np.where(np.array(calorb[x.name])==1)[0]
-#         ti = np.repeat(t1, t1.size)
-#         tj = np.tile(t1, t1.size)
-#         tr = np.stack((ti, tj), axis=1) + i * 10
-#         temp1.append(t1.size) # Graph中原子序号
-#         temp2.append(tr) # 在位能不同轨道
-#         temp3 = np.append(temp3, t1)
-#         temp4 = np.append(temp4, np.arange(0, t1.size**2, t1.size)+np.arange(0,t1.size,1)+shapes) # 在位能同轨道
-#         shapes += tr.shape[0]
-
-#     temp1 = np.arange(0,cell_atom_num,1).repeat(temp1)
-    
-#     return [temp1, temp2, temp3, temp4]
-
-
 def get_onsite_key(crystal, calorb, cell_atom_num):
     shapes = 0
 
@@ -196,35 +171,6 @@ def get_orb_index(crystal, calorb, cell_atom_num, atom_num):
 
     return orb1_index, orb2_index
 
-# def get_orb_index(crystal, calorb, cell_atom_num, atom_num):
-#     orb1_indexs, orb1_indexp, orb1_indexd, orb1_indexS = [], [], [], []
-#     orb2_indexs, orb2_indexp, orb2_indexd, orb2_indexS = [], [], [], []
-#     # orb2_index = [np.zeros(cell_atom_num, 1), np.zeros((cell_atom_num, 3)), np.zeros((cell_atom_num, 5)), np.zeros(cell_atom_num, 1)]
-
-#     for i in range(atom_num):
-#         atom = calorb[crystal.species[i].name]
-
-#         if atom[0]:
-#             orb1_indexs.append(i)
-#             orb2_indexs.append(i + i * 9)
-        
-#         if atom[1] or atom[2] or atom[3]:
-#             orb1_indexp.append(i)
-#             orb2_indexp.append(i + np.array([1,2,3]) + i * 9)
-
-#         if atom[4] or atom[5] or atom[6] or atom[7] or atom[8]:
-#             orb1_indexd.append(i)
-#             orb2_indexd.append(i + np.array([4,5,6,7,8]) + i * 9)
-
-#         if atom[9]:
-#             orb1_indexS.append(i)
-#             orb2_indexS.append(i + i * 9 + 9)
-
-#     orb1_index = [orb1_indexs,orb1_indexp,orb1_indexd,orb1_indexS]
-#     orb2_index = [orb2_indexs,orb2_indexp,orb2_indexd,orb2_indexS]
-
-#     return orb1_index, orb2_index
-
 def read_cif(cif_file, calorb):
 
 ### lattice and orbit
@@ -239,8 +185,9 @@ def read_cif(cif_file, calorb):
     images = crystal.get_neighbor_list(r_neighborhood)[2]
     dim = np.sum(np.abs(images), axis=0, dtype=int)
     dim[dim != 0] = 1
-    rvectors_all = rvector_init(dim)
-    rvectors = rvectors_all[:int((3 ** np.sum(dim) + 1)/2)]
+    rvectors_all = rvectors = rvector_init(dim)
+
+    # rvectors = rvectors_all[:int((3 ** np.sum(dim) + 1)/2)]
     # rvectors = np.array([[0,0,0],[0,0,1],[0,1,0],[0,1,1],[0,1,-1],[0,0,-1],[0,-1,0],[0,-1,-1],[0,-1,1]])
 
     atomic_numbers = np.array(crystal.atomic_numbers)

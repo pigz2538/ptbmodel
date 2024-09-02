@@ -45,14 +45,25 @@ def construct_hr(hsk, hopping_info, orb_num, cell_atom_num, rvectors):
         
     HR = torch.cat(hr).to(device)
     HR = HR.reshape(rvectors.shape[0], -1, HR.shape[1])
-    HR[4] =(HR[4].transpose(1,0) + HR[4])/2
 
-    HR5 = HR[3].clone().transpose(1,0).unsqueeze(0)
-    HR6 = HR[2].clone().transpose(1,0).unsqueeze(0)
-    HR7 = HR[1].clone().transpose(1,0).unsqueeze(0)
-    HR8 = HR[0].clone().transpose(1,0).unsqueeze(0)  
+    HR[0] = (HR[0] + HR[8])/2
+    HR[1] = (HR[1] + HR[7])/2
+    HR[2] = (HR[2] + HR[6])/2
+    HR[3] = (HR[3] + HR[5])/2
 
-    HR = torch.cat([HR, HR5, HR6, HR7, HR8], dim=0)
+    HR[4] = (HR[4].transpose(1,0) + HR[4])/2
+
+    HR[5] = torch.transpose((HR[3] + HR[5])/2, 1,0)
+    HR[6] = torch.transpose((HR[2] + HR[6])/2, 1,0)
+    HR[7] = torch.transpose((HR[1] + HR[7])/2, 1,0)
+    HR[8] = torch.transpose((HR[0] + HR[8])/2, 1,0)
+
+    # HR5 = HR[3].clone().transpose(1,0).unsqueeze(0)
+    # HR6 = HR[2].clone().transpose(1,0).unsqueeze(0)
+    # HR7 = HR[1].clone().transpose(1,0).unsqueeze(0)
+    # HR8 = HR[0].clone().transpose(1,0).unsqueeze(0)  
+
+    # HR = torch.cat([HR, HR5, HR6, HR7, HR8], dim=0)
     return HR
 
 def compute_bands(HR, eikr):
