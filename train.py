@@ -12,7 +12,7 @@ from model import WHOLEMODEL
 from dgl.dataloading import GraphDataLoader
 from dgl import batch
 import warnings
- 
+
 warnings.filterwarnings('ignore')  # 忽略所有警告
 
 device = 'cuda:0'
@@ -163,6 +163,7 @@ def train(dist_path):
     opt = torch.optim.AdamW(model.parameters(), lr_radio_init, eps=lr_eps)
     
     # opt = torch.optim.SGD(model.parameters(), lr=lr_radio_init)
+    # sch = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=lr_patience*int(train_num / batch_size), eta_min=min_lr, verbose=lr_verbose)
     sch = torch.optim.lr_scheduler.ReduceLROnPlateau(opt, mode='min', factor=lr_factor, patience=lr_patience*int(train_num / batch_size), verbose=lr_verbose, threshold=lr_threshold, threshold_mode='rel', cooldown=cooldown*int(train_num / batch_size), min_lr=min_lr, eps=lr_eps)
 
     print(lr_patience*int(train_num / batch_size))
@@ -259,7 +260,7 @@ def train(dist_path):
             loss.backward()
             opt.step()
 
-        #test part
+        # test part
         with torch.no_grad():
             test_loss = 0
             for graphs, labels in test_dataloader:
@@ -273,8 +274,8 @@ def train(dist_path):
 
                 test_loss += criterion2(reproduced_bands[:, test_start_band:test_end_band], testinfos[i]['tensor_E'][:, test_start_band:test_end_band]).item()
         
-        # print(loss_per_epoch)
-        # print(test_loss)
+        print(loss_per_epoch)
+        print(test_loss)
         losses[epoch - 1] = loss_per_epoch.sum() / train_num
         test_losses[epoch - 1] = test_loss / test_num 
         current_lr = opt.param_groups[0]['lr']

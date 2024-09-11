@@ -185,7 +185,9 @@ def read_cif(cif_file, calorb):
     images = crystal.get_neighbor_list(r_neighborhood)[2]
     dim = np.sum(np.abs(images), axis=0, dtype=int)
     dim[dim != 0] = 1
-    rvectors_all = rvectors = rvector_init(dim)
+    rvectors_all = rvector_init(dim)
+
+    rvectors = rvectors_all[:int((3 ** np.sum(dim) + 1)/2)]
 
     # rvectors = rvectors_all[:int((3 ** np.sum(dim) + 1)/2)]
     # rvectors = np.array([[0,0,0],[0,0,1],[0,1,0],[0,1,1],[0,1,-1],[0,0,-1],[0,-1,0],[0,-1,-1],[0,-1,1]])

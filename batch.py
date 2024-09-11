@@ -33,7 +33,7 @@ def read_data(path, data_num):
         with open(os.path.join(pwd, subdir + '.json'), 'r') as f:
             setjson = json.load(f)
 
-        cif_file = os.path.join(pwd, subdir + '.cif')
+        cif_file = os.path.join(pwd, subdir.split('_')[0] + '_' + subdir.split('_')[1] + '.cif')
         fermi_level = setjson['fermi_level']
         bands = np.load(os.path.join(pwd, 'bands.npy')) + fermi_level
         kpoints = np.load(os.path.join(pwd, 'k_points.npy'))
@@ -74,7 +74,8 @@ def read_data(path, data_num):
 
         infos[label] = {}
 
-        infos[label]['filename'] = setjson['filename'].replace('.py','')
+        infos[label]['filename'] = setjson['filename'].replace('.py','').replace('.txt','').replace('.cif','')
+        infos[label]['kpath'] = subdir.split('_')[-1]
         infos[label]['cell_atom_num'] = setjson['cell_atom_num']
         infos[label]['atom_num'] = atom_num
         infos[label]['d'] = torch.tensor(d).to(device)

@@ -46,24 +46,26 @@ def construct_hr(hsk, hopping_info, orb_num, cell_atom_num, rvectors):
     HR = torch.cat(hr).to(device)
     HR = HR.reshape(rvectors.shape[0], -1, HR.shape[1])
 
-    HR[0] = (HR[0] + HR[8])/2
-    HR[1] = (HR[1] + HR[7])/2
-    HR[2] = (HR[2] + HR[6])/2
-    HR[3] = (HR[3] + HR[5])/2
+
+
+    # HR[0] = (HR[0] + HR[8])/2
+    # HR[1] = (HR[1] + HR[7])/2
+    # HR[2] = (HR[2] + HR[6])/2
+    # HR[3] = (HR[3] + HR[5])/2
 
     HR[4] = (HR[4].transpose(1,0) + HR[4])/2
 
-    HR[5] = torch.transpose((HR[3] + HR[5])/2, 1,0)
-    HR[6] = torch.transpose((HR[2] + HR[6])/2, 1,0)
-    HR[7] = torch.transpose((HR[1] + HR[7])/2, 1,0)
-    HR[8] = torch.transpose((HR[0] + HR[8])/2, 1,0)
+    # HR[5] = torch.transpose((HR[3] + HR[5])/2, 1,0)
+    # HR[6] = torch.transpose((HR[2] + HR[6])/2, 1,0)
+    # HR[7] = torch.transpose((HR[1] + HR[7])/2, 1,0)
+    # HR[8] = torch.transpose((HR[0] + HR[8])/2, 1,0)
 
-    # HR5 = HR[3].clone().transpose(1,0).unsqueeze(0)
-    # HR6 = HR[2].clone().transpose(1,0).unsqueeze(0)
-    # HR7 = HR[1].clone().transpose(1,0).unsqueeze(0)
-    # HR8 = HR[0].clone().transpose(1,0).unsqueeze(0)  
+    HR5 = HR[3].clone().transpose(1,0).unsqueeze(0)
+    HR6 = HR[2].clone().transpose(1,0).unsqueeze(0)
+    HR7 = HR[1].clone().transpose(1,0).unsqueeze(0)
+    HR8 = HR[0].clone().transpose(1,0).unsqueeze(0)  
 
-    # HR = torch.cat([HR, HR5, HR6, HR7, HR8], dim=0)
+    HR = torch.cat([HR, HR5, HR6, HR7, HR8], dim=0)
     return HR
 
 def compute_bands(HR, eikr):
@@ -260,8 +262,10 @@ def batch_index(train_dataloader, infos, batch_size):
         rvectors.append(torch.stack(rvectors_batch, dim=0))
         rvectors_all.append(torch.stack(rvectors_all_batch, dim=0))
 
-        tensor_eikr.append(torch.stack(tensor_eikr_batch, dim=0))
-        tensor_E.append(torch.stack(tensor_E_batch, dim=0))
+        # tensor_eikr.append(torch.stack(tensor_eikr_batch, dim=0))
+        # tensor_E.append(torch.stack(tensor_E_batch, dim=0))
+        tensor_eikr.append(tensor_eikr_batch)
+        tensor_E.append(tensor_E_batch)
 
         onsite_key.append([np.concatenate(ok1), np.concatenate(ok2), np.concatenate(ok3), np.concatenate(ok4)])
 
@@ -276,3 +280,4 @@ def batch_index(train_dataloader, infos, batch_size):
         filename.append(filename_batch)
 
     return para_sk, hopping_index, hopping_info, d, is_hopping, onsite_key, cell_atom_num, onsite_num, orb1_index, orb2_index, orb_num, rvectors, rvectors_all, tensor_E, tensor_eikr, orb_key, filename
+
